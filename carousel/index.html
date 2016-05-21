@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Document</title>
+	<style type="text/css">
+	#container{
+		width: 600px;
+		height:400px;
+		border:1px solid black;
+		overflow: hidden;
+		position:relative;
+	}
+	#list{
+		float:left;
+		width:4200px;
+		position:absolute;
+		z-index:1;
+		/*left:-600px;*/
+	}
+	#list img{
+		float:left;
+		width:600px;
+		
+	}
+	#buttons{
+		display: inline-block;
+		/*background-color: #000;*/
+		width:100px;
+		height:10px;
+		z-index: 2;
+		position: absolute;
+		bottom:20px;
+		left:250px;
+
+
+	}
+	 #buttons .on {  background: orange;}
+	#buttons span{
+		cursor:pointer;
+		float:left;
+		border:1px solid #fff;
+		margin-left:5px;
+		width:10px;
+		height:10px;
+		border-radius: 50%;
+		background-color: #333;
+		
+		
+	}
+	.arrow{
+		cursor:pointer;
+		display:none;
+		line-height: 39px;
+		text-align: center; 
+		font-size:36px;
+		font-weight:bold;
+		width:25px;
+		text-decoration: none;
+		position:absolute;
+		z-index:2;
+		top:180px;
+		background-color:RGBA(0,0,0,.3); 
+		color: #fff;
+
+	}
+	.arrow:hover { background-color: RGBA(0,0,0,.7);}
+     #container:hover .arrow { display: block;}
+	 #prev { left: 20px;}
+     #next { right: 20px;}
+	</style>
+</head>
+<body>
+	<div id="bannar">
+	<ul id="list">
+		<li><img src="img/5.jpg"></li>
+		<li><img src="img/1.jpg"></li>
+		<li><img src="img/2.jpg"></li>
+		<li><img src="img/3.jpg"></li>
+		<li><img src="img/4.jpg"></li>
+		<li><img src="img/5.jpg"></li>
+		<li><img src="img/1.jpg"></li>
+	</ul>
+	</div>
+	<script type="text/javascript" src ="src/script.js">
+		/*var container=document.getElementById("container");
+		var prev=document.getElementById("prev");
+		var next=document.getElementById("next");
+		var list=document.getElementById("list");
+		//console.log(list.style.left);
+		var button=document.getElementById("buttons")
+		var buttons=document.getElementById("buttons").getElementsByTagName("span");
+		var imgs=list.getElementsByTagName("img");
+
+		var time=null;
+
+		var index=1;
+		// span的背景色改变
+		function showButton(){
+			for (var i = 0; i < buttons.length; i++) {
+				if(buttons[i].className=="on"){
+					buttons[i].className="";
+					break;
+				}
+			}
+			buttons[index-1].className='on';
+		}
+
+		//定义动画函数 
+		function animate(ele,end){
+			
+			var timer=null;
+			clearInterval(timer);
+			timer=setInterval(function(){
+				//速度随着现有偏移量和目标偏移量的距离的改变而改变
+				var speed=200;
+
+				if ((speed>0&&parseInt(ele.style.left)<end)||(speed<0&&parseInt(ele.style.left)>end)){
+					ele.style.left=ele.offsetLeft+speed+'px';
+				}else{
+					//当偏移量大于-600或小于-3000时的处理方式
+					clearInterval(timer);
+					ele.style.left = ele.offsetLeft + 'px';
+                    if(parseInt(ele.style.left)>-600){
+                        ele.style.left = "-3000px" ;
+                    }
+                    if(parseInt(ele.style.left)<-3000) {
+                        ele.style.left = '-600px';
+                    }
+				}
+			},50);
+
+		}
+
+
+		function play(){
+			time=setInterval(function(){
+				next.onclick();
+			},3000);
+		}
+
+		function stop(){
+			clearInterval(time);
+		}
+		//当鼠标离开容器时 图片自动播放
+		container.onmouseover=stop;
+		// 当鼠标离开容器时 图片停止自动播放
+		container.onmouseout=play;
+
+		next.onclick=function(){
+			if(index==5){
+				index=1
+			}else{
+				index+=1;
+			}
+			
+			animate(list,parseInt(list.style.left)-600);
+			showButton();
+		}
+		
+		prev.onclick=function(){
+			animate(list,parseInt(list.style.left)+600);
+			if (index==1) {
+				index=5
+			}else{
+				index-=1;
+			}
+			
+			showButton();
+		}
+		button.addEventListener("click",function(e){
+			//点击span元素时 出现相应的图片 并改变相应span的背景色
+			var target=e.target;
+			if ((target.tagName).toLowerCase()=="span") {
+				index=target.getAttribute("index");
+				showButton();
+				animate(list,-600*index);
+				}
+		},false);*/
+	</script>
+</body>
+</html>
