@@ -1,12 +1,16 @@
 .banner{
+	padding:0;
 		width: 600px;
-		height:auto;
-		height:400px;
+
+		line-height: 0;
+		
+
 		border:1px solid black;
-		overflow: hidden;
+		/*overflow: hidden;*/
 		position:relative;
 	}
 .banner ul{
+	margin:0;
 	padding:0;
 	/*width:4200px;*/
 	position:absolute;
@@ -60,7 +64,8 @@
 		text-decoration: none;
 		position:absolute;
 		z-index:2;
-		top:180px;
+		top:50%;
+		transform: translate(0,-50%);
 		background-color:RGBA(0,0,0,.3); 
 		color: #fff;
 

@@ -6,7 +6,7 @@
 		self.defaults = {
 			autoplay: true,//定义轮播图是否自动播放
 			delay: 3000,//定义动画自动播放的间隔时间
-			speed: "50%", //定义动画的速度
+			speed: "10%", //定义动画的速度
 			arrows: {
 				prevButton: true,
 				nextButton: true
@@ -50,9 +50,11 @@
 		self.animation = '';
 		self.speed = 0;
 		self.prefix = self._ + '-';
+		self.flag = false;
+
 		//self.eventSuffix = self.prefix + ~~(Math.random()*2e3);
 
-		self.interval = null;
+		self.timmer = null;
 
 
 		self.options = Carousel.extend(self.defaults,options);
@@ -69,17 +71,22 @@
 
 		
 		//一直无限循环
-		Carousel.calculateSlides();
+		Carousel.calculateSlides(elem);
 		//自动播放
 		self.options.autoplay && Carousel.start();
+		elem.onmouseover = Carousel.stop;
+		elem.onmouseout = Carousel.start;
 
 		return this;
 	}
-	/*？？？？？？？？？？？？？？？？？？？？？？？、作用域问题？？？？？？*/
 
+	/**
+	 * 修改ul中的li 使其能无限循环
+	 * @param  {HTML元素} elem 需要焦点轮播图的元素
+	 * @return {this}      方便链式操作
+	 */
 	Carousel.setup = function(elem){
-		//self.className += self.prefix + self.options.animation;
-		console.log(self.total);
+		//在最后的li元素后添加第一个li 在第一个li前添加最后一个li
 		var lastNode = self.slides[self.total-1].cloneNode(true);
 		var firstNode = self.slides[0].cloneNode(true);
 		self.container.appendChild(firstNode);
@@ -93,12 +100,21 @@
 
 	}
 
-	Carousel.calculateSlides = function(){
+	/**
+	 * 设置ul li 和包裹元素的宽度和高度
+	 * @param  {HTML元素} elem 需要焦点轮播图的元素
+	 * @return {this}      方便链式操作
+	 */
+	Carousel.calculateSlides = function(elem){
 		self.slides = self.container.getElementsByTagName("li");
+		var slideWidth = document.defaultView.getComputedStyle(self.slides[0],null).width||self.slides[0].currentStyle.width;
+		var slideHeight = document.defaultView.getComputedStyle(self.slides[0],null).height||self.slides[0].currentStyle.height;
+		elem.style.width = slideWidth;
+		elem.style.height = slideHeight;
 		self.currentTotal = self.slides.length;
-		self.container.style.width = (self.total *100) + '%';
+		self.container.style.width = (self.currentTotal *100) + '%';
 		for(var k = 0; k < self.currentTotal; k++){
-			self.slides[k].style.width = (100/self.total) + '%';
+			self.slides[k].style.width = (100/self.currentTotal) + '%';
 			console.log(self.slides[k].style.width);
 		}
 
@@ -106,7 +122,11 @@
 		console.log(self.container.style.left);
 		
 	}
-	//初始化小按钮
+	/**
+	 * 初始化导航按钮
+	 * @param  {HTML元素} elem 需要焦点轮播图的元素
+	 * @return {this}      方便链式操作
+	 */
 	Carousel.initNav = function(elem){
 		self.nav = document.createElement("nav");
 		self.nav.className = self.prefix + 'nav';
@@ -116,26 +136,32 @@
 			span.setAttribute("index",i+1);
 			self.nav.appendChild(span);
 		}
+		//第一个元素添加类
 		self.nav.getElementsByTagName("span")[0].className = "on";
 		elem.appendChild(nav);
-
+		//添加点击事件 当点击第i个span的时候 显示第i个li
 		self.nav.onclick = function(e){
+			if (self.flag) {
+    		return;
+  		}
 			//点击span元素时 出现相应的图片 并改变相应span的背景色
 			var target = e.target;
 			if ((target.tagName).toLowerCase()=="span") {
-				self.index = target.getAttribute("index");
+				console.log(target.getAttribute("index"));
+				self.index = parseInt(target.getAttribute("index"));
 				Carousel.navStyle();
-
-				console.log(100*parseInt(self.index));
-
-				Carousel.animate(self.container, parseInt(100*parseInt(self.index))+"%");
+				Carousel.animate(self.container, parseInt(-100*parseInt(self.index)));
 				}
 		}
 		
 	}
-	//初始化前后按钮
+	/**
+	 * 初始化箭头按钮
+	 * @param  {HTML元素} elem 需要焦点轮播图的元素
+	 * @return {this}      方便链式操作
+	 */
 	Carousel.initArrows = function(elem){
-		
+		//添加箭头元素
 		self.arrows.prevButton = document.createElement('a');
 		self.arrows.prevButton.href = 'javascript:;';
 		self.arrows.prevButton.setAttribute("class","arrow");
@@ -148,31 +174,41 @@
 		self.arrows.nextButton.className = 'arrow next';
 		self.arrows.nextButton.innerHTML = "&gt;";
 		elem.appendChild(self.arrows.nextButton);
-
+		//给箭头按钮添加事件 当点击按钮时 li移动
 		self.arrows.prevButton.onclick = function(){
+			if(self.flag){
+				return;
+			}
 			
-			if (index == 1) {
-				index = self.total;
+			if (self.index == 1) {
+				self.index = self.total;
 			}else{
-				index-=1;
+				self.index-=1;
 			}
 			
 			Carousel.navStyle();
-			Carousel.animate(self.container,parseInt("-" + self.index)*100+"%");
+			Carousel.animate(self.container,(parseInt(self.container.style.left)+100));
 		}
 
 		self.arrows.nextButton.onclick = function(){
-			if(self.index == self.total){
+			if(self.flag){
+				return;
+			}
+
+			if(self.index == self.total ){
 				self.index = 1
 			}else{
-				self.index+=1;
+				self.index += 1;
 			}
 			console.log(self.index);
-			Carousel.animate(self.container,parseInt("-" + self.index) * 100+"%");
+			Carousel.animate(self.container,(parseInt(self.container.style.left)-100));
 			Carousel.navStyle();
 		}
 	}
-	
+	/**
+	 * 导航按钮的样式变化（给当前导航按钮添加“on”类）
+	 * @return {[type]} [description]
+	 */
 	Carousel.navStyle = function(){
 	
 
@@ -182,70 +218,67 @@
 				break;
 			}
 		}
+
 		self.nav.getElementsByTagName("span")[self.index-1].className='on';
 		
 	}
 
+	/**
+	 * 实现动画
+	 * @param  {HTML元素} elem 在该元素内实现动画
+	 * @param  {num} end  动画需要到达的终点
+	 * @return {this}      方便链式操作
+	 */
 	Carousel.animate = function(elem, end){
+		self.flag = true;
+		var length = parseInt(end)-parseInt(self.container.style.left);
 		console.log("end"+ end);
 		var aniStyle = self.options.animation;
-		//var end = self.container.offsetLeft - parseInt(document.defaultView.getComputedStyle(elem).width||elem.currentStyle.width)
 		
-		var timer=null;
-			clearInterval(timer);
-			timer=setInterval(function(){
-				//速度随着现有偏移量和目标偏移量的距离的改变而改变
-				self.options.speed = ((parseFloat(end)-parseFloat(self.container.style.left))/1.1)+"%" ;
-				console.log("speed"+self.options.speed);
-					/*if(end < self.container.left){
-						self.options.speed = "-"+self.options.speed;
-					}
-					*/
-		
-				console.log("left"+self.container.style.left);
+		var interval = null
+			clearInterval(interval);
+			self.options.speed = ((length/100)*parseInt(self.options.speed))+"%";
+			interval = setInterval(function(){
 
-				/*console.log(parseFloat(self.options.speed)<0);
-				console.log(self.container.style.left < end);*/
+					
 		
 				if ((parseFloat(self.options.speed)> 0 && parseFloat(self.container.style.left)< parseFloat(end))||(parseFloat(self.options.speed) < 0 && parseFloat(self.container.style.left) > parseFloat(end))){
-					console.log("zheng");
-					console.log("left");
-					console.log(((parseFloat(end)-parseFloat(self.container.style.left))*parseFloat(self.options.speed))/100);
-					self.container.style.left = (parseFloat(self.container.style.left)-((parseFloat(end)-parseFloat(self.container.style.left))*parseFloat(self.options.speed))/100)+"%" ;
-					console.log("left"+self.container.style.left );
-				}else{
-					console.log("fu");
-					//当偏移量大于-600或小于-3000时的处理方式
-					clearInterval(timer);
+					
+					self.container.style.left = (parseFloat(self.container.style.left)+parseFloat(self.options.speed))+"%" ;
 
-					console.log(self.container.style.left);
-					console.log(self.container.style.left >= "-100%");
-					//console.log(parseFloat("-"+parseFloat(self.slides[0].width)));
-					//self.container.style.left = self.container.offsetLeft ;
+				}else{
+					
+					clearInterval(interval);
+
+					//当偏移量大于-600或小于-3000时的处理方式
           if(parseFloat(self.container.style.left) >= parseFloat("-100%")){
           	console.log("ifififf");
               self.container.style.left = (-100) * self.total+"%";
               console.log(self.container.style.left);
           }
-          if(parseFloat(self.container.style.left)<=parseFloat('-'+self.slides[0] * self.total)) {
+          console.log(parseInt(self.container.style.left)<=parseInt(-100 * (self.total+1)))
+          if(parseInt(self.container.style.left)<=parseInt(-100 * (self.total+1))) {
           	console.log(self.container.style.left);
-             self.container.style.left = -self.slides[0].width;
+             self.container.style.left = "-100%";
           }
+          self.flag = false;
 				}
 			},50);
 	}	
 		//自动播放
 	Carousel.start = function(){
-		time=setInterval(function(){
+		self.timer = setInterval(function(){
 				self.arrows.nextButton.onclick();
 			},self.options.delay);
 		return this;
 	}
 
 	Carousel.stop = function(){
-		clearTimeout(self.interval);
+		clearTimeout(self.timer);
 		return this;
 	}
+
+
 
 	/*深拷贝与浅拷贝：
 	浅拷贝使拷贝的变量和源变量共用一个内存地址
@@ -364,5 +397,3 @@
 
 })(window,document);
 
-
-var carousel = Carousel(document.getElementById("banner"),{});
