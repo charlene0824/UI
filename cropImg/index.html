@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>图片裁切实现</title>
+	<link rel="stylesheet" type="text/css" href="src/jquery.Jcrop.css">
+</head>
+<body>
+<div>
+	<img src="img/1.jpg" id = "img">
+	<span id = "pre_box" class="crop_pre" style="display:inline-block;width:200px;height:200px;overflow: hidden;border:1px solid red">
+		<img src="img/1.jpg" id="crop_pre">
+	</span>
+</div>
+<script type="text/javascript" src="src/jquery.min.js"></script>
+<script type="text/javascript" src="src/jquery.Jcrop.js"></script>
+<script type="text/javascript">
+	$(document).ready(function(){
+		/*var api = $.Jcrop('#cropbox',{  
+                 onChange: showPreview,  
+                 onSelect: showPreview,  
+                 aspectRatio: 1  
+          });*/  
+		var api = $.Jcrop("#img",{
+			boxWidth:200,
+			boxHeight:200,
+			onChange:showPreview,
+			onSelect:showPreview,
+			aspectRatio:1
+		})
+		console.log(api);
+		
+		api.setSelect([$("#img").width()>$("#img").height()?1/2*($("#img").width()-$("#img").height()):0,
+									$("#img").width()>$("#img").height()?0:1/2*($("#img").height()-$("#img").width()),
+									$("#img").width()>$("#img").height()?1/2*($("#img").width()+$("#img").height()):$("#img").height(),
+									$("#img").width()>$("#img").height()?$("#img").height():1/2*($("#img").height()+$("#img").width())]);
+		function showPreview(coords){
+			console.log(coords);
+			if(parseInt(coords.w)>0){
+				var rx = $("#pre_box").width()/coords.w;
+				var ry = $("#pre_box").height()/coords.h;
+				$("#crop_pre").css({
+					width:Math.round(rx*$("#img").width())+"px",
+					height:Math.round(ry*$("#img").height())+"px",
+					marginLeft:"-"+Math.round(rx*coords.x)+"px",
+					marginTop:"-"+Math.round(ry*coords.y)+"px"
+				})
+			}
+		}
+	})
+</script>
+</body>
+</html>
