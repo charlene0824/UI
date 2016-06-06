@@ -259,8 +259,8 @@
       var trk = $('<div></div>').addClass(cssClass('tracker'));
       if (is_msie) {
         trk.css({
-          opacity: 0.5,
-          backgroundColor: 'black'
+          opacity: 0,
+          backgroundColor: 'white'
         });
       }
       return trk;
